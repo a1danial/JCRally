@@ -19,22 +19,24 @@ package com.example.compose.rally
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
+import com.example.compose.rally.RallyScreen.Accounts
+import com.example.compose.rally.RallyScreen.Bills
+import com.example.compose.rally.RallyScreen.Overview
 import com.example.compose.rally.data.UserData
 import com.example.compose.rally.ui.accounts.AccountsBody
+import com.example.compose.rally.ui.accounts.SingleAccountBody
 import com.example.compose.rally.ui.bills.BillsBody
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.overview.OverviewBody
@@ -58,31 +60,42 @@ fun RallyApp() {
     RallyTheme {
         val allScreens = RallyScreen.values().toList()
         val navController = rememberNavController()
-        val backStackEntry = navController.currentBackStackEntryAsState()
-        var currentScreen = RallyScreen.fromRoute(backStackEntry.value?.destination?.route)
+        val backstackEntry = navController.currentBackStackEntryAsState()
+        var currentScreen = RallyScreen.fromRoute(backstackEntry.value?.destination?.route)
 
         Scaffold(
             topBar = {
                 RallyTabRow(
                     allScreens = allScreens,
-                    onTabSelected = { screen -> navController.navigate(screen.name) },
+                    onTabSelected = { screen ->
+                        navController.navigate(screen.name)
+                    },
                     currentScreen = currentScreen
                 )
             }
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = RallyScreen.Overview.name,
+                startDestination = Overview.name,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable(RallyScreen.Overview.name) {
-                    OverviewBody()
+                val accountsName = RallyScreen.Accounts.name
+                composable(Overview.name) {
+                    OverviewBody(
+                        onClickSeeAllAccounts = { navController.navigate(Accounts.name) },
+                        onClickSeeAllBills = { navController.navigate(Bills.name) },
+                    )
                 }
-                composable(RallyScreen.Accounts.name) {
+                composable(Accounts.name) {
                     AccountsBody(accounts = UserData.accounts)
                 }
-                composable(RallyScreen.Bills.name) {
+                composable(Bills.name) {
                     BillsBody(bills = UserData.bills)
+                }
+                composable(
+                    route = "$accountsName/{name}"
+                ) {
+
                 }
             }
         }
