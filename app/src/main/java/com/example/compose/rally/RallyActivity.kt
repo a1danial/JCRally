@@ -58,6 +58,9 @@ class RallyActivity : ComponentActivity() {
 @Composable
 fun RallyApp() {
     RallyTheme {
+//        val allScreens1 = RallyScreen
+//        val allScreens2 = RallyScreen.values()
+//        val allScreens3 = allScreens2.toList()
         val allScreens = RallyScreen.values().toList()
         val navController = rememberNavController()
         val backstackEntry = navController.currentBackStackEntryAsState()
